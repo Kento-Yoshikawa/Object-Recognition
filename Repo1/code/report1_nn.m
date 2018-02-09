@@ -28,26 +28,31 @@ dist2=dist2 + 10000*eye(size(dist2));
 
 for i=1:200
   [v idx1]=min(dist(i,:));
+  [v idx2]=min(dist2(i,:));
   if idx1<=200 
     correct=correct+1;
-    correct2=correct2+1;
   else
     incorrect=incorrect+1;
-    incorrect2=incorrect2+1;
   end
+
+    if idx2<=200
+      correct2=correct2+1;
+   else
+      incorrect2=incorrect2+1;
+    end
 end
 
 for i=201:400
-  [v idx2]=min(dist(i,:));
-  [v idx3]=min(dist2(i,:));
+  [v idx3]=min(dist(i,:));
+  [v idx4]=min(dist2(i,:));
   
-  if idx2<=200 
+  if idx3<=200 
     incorrect=incorrect+1;
   else
     correct=correct+1;
   end
   
-  if idx3<=200
+  if idx4<=200
     incorrect2=incorrect2+1;
   else
     correct2=correct2+1;
@@ -61,5 +66,6 @@ fprintf('classification rate by nearest neighbor betweeen simlar images: %.5f\n'
 %{
 実行例
 classification rate by nearest neighbor betweeen less simlar images: 0.80250
-classification rate by nearest neighbor betweeen simlar images: 0.72500
+classification rate by nearest neighbor betweeen simlar images: 0.66000
+
 %}

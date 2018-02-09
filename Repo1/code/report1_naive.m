@@ -21,6 +21,229 @@ pr_neg2=sum(D_neg2)+1;
 pr_neg2=pr_neg2/sum(pr_neg2);
 pr_neg2=log(pr_neg2);
 
+%{
+cv=5;
+n=200;
+idx=[1:n];
+accuracy=[];
+
+for i=1:cv
+
+eval_pos =D_pos(find(mod(idx,cv)==(i-1)),:);
+train_pos=D_pos(find(mod(idx,cv)~=(i-1)),:);
+eval_neg =D_neg(find(mod(idx,cv)==(i-1)),:);
+train_neg=D_neg(find(mod(idx,cv)~=(i-1)),:);
+
+train=[train_pos; train_neg];
+eval=[eval_pos; eval_neg];
+
+
+pr_pos=sum(train_pos)+1;
+pr_pos=pr_pos/sum(pr_pos);
+pr_pos=log(pr_pos);
+
+pr_neg=sum(train_neg)+1;
+pr_neg=pr_neg/sum(pr_neg);
+pr_neg=log(pr_neg);
+
+
+pr_pos2=sum(eval_pos)+1;
+pr_pos2=pr_pos2/sum(pr_pos2);
+pr_pos2=log(pr_pos2);
+
+pr_neg2=sum(eval_neg)+1;
+pr_neg2=pr_neg2/sum(pr_neg2);
+pr_neg2=log(pr_neg2);
+
+
+correct=0;
+incorrect=0;
+
+%ポジティブ画像に対して分類を行う
+for j=1:160
+  im_neg_train=train(j,:);%学習画像のうちポジティブ画像のみを抽出
+  max0=max(im_neg_train);
+  idx=[];
+  for l=1:max0
+    idx=[idx find(im_neg_train>=l)];
+  end
+  
+  %学習画像のポジティブ画像のbovwベクトルim_pos_trainに対応するpr_pos,pr_negの和
+  pr_im_pos_train=sum(pr_pos(idx));
+  pr_im_neg_train=sum(pr_neg(idx));
+ 
+  %評価画像のbovwベクトルim_pos_evalに対応するpr_pos2,pr_neg2の和を求め
+  %学習画像,pr_im_neg_trainより,pr_im_pos_evalの値が大きければ
+  %評価データをポジティブ画像として正しく認識したと判定
+  for k=1:40
+      im_pos_eval=eval(k,:);
+      max1=max(im_pos_eval);
+      idx2=[];
+      for m=1:max1
+        idx2=[idx2 find(im_pos_eval>=m)];
+      end
+     pr_im_pos_eval=sum(pr_pos2(idx2));
+     pr_im_neg_eval=sum(pr_neg2(idx2));
+     
+      if pr_im_neg_train < pr_im_pos_eval
+          correct=correct+1;
+      else
+          incorrect=incorrect+1;
+      end
+  end
+  
+end
+
+%ネガディブ画像に対して分類を行う
+for j=160:320
+  im_neg_train=train(j,:);%学習画像のうちポジティブ画像のみを抽出
+  max0=max(im_neg_train);
+  idx=[];
+  for l=1:max0
+    idx=[idx find(im_neg_train>=l)];
+  end
+  
+  %学習画像のポジティブ画像のbovwベクトルim_pos_trainに対応するpr_pos,pr_negの和
+  pr_im_pos_train=sum(pr_pos(idx));
+  pr_im_neg_train=sum(pr_neg(idx));
+ 
+  %評価画像のbovwベクトルim_neg_evalに対応するpr_pos2,pr_neg2の和を求め
+  %学習画像,pr_im_pos_trainより,pr_im_neg_evalの値が大きければ
+  %評価データをネガティブ画像として正しく認識したと判定
+  for k=1:40
+      im_neg_eval=eval(k,:);
+      max1=max(im_neg_eval);
+      idx2=[];
+      for m=1:max1
+        idx2=[idx2 find(im_neg_eval>=m)];
+      end
+     pr_im_pos_eval=sum(pr_pos2(idx2));
+     pr_im_neg_eval=sum(pr_neg2(idx2));
+     
+      if pr_im_pos_train < pr_im_neg_eval
+          correct=correct+1;
+      else
+          incorrect=incorrect+1;
+      end
+  end
+ 
+end
+correct_rate=correct/(correct+incorrect);
+accuracy=[accuracy correct_rate];
+end
+
+
+for i=1:cv
+
+eval_pos =D_pos(find(mod(idx,cv)==(i-1)),:);
+train_pos=D_pos(find(mod(idx,cv)~=(i-1)),:);
+eval_neg =D_neg2(find(mod(idx,cv)==(i-1)),:);
+train_neg=D_neg2(find(mod(idx,cv)~=(i-1)),:);
+
+train=[train_pos; train_neg];
+eval=[eval_pos; eval_neg];
+
+
+pr_pos=sum(train_pos)+1;
+pr_pos=pr_pos/sum(pr_pos);
+pr_pos=log(pr_pos);
+
+pr_neg=sum(train_neg)+1;
+pr_neg=pr_neg/sum(pr_neg);
+pr_neg=log(pr_neg);
+
+
+pr_pos2=sum(eval_pos)+1;
+pr_pos2=pr_pos2/sum(pr_pos2);
+pr_pos2=log(pr_pos2);
+
+pr_neg2=sum(eval_neg)+1;
+pr_neg2=pr_neg2/sum(pr_neg2);
+pr_neg2=log(pr_neg2);
+
+
+correct=0;
+incorrect=0;
+
+%ポジティブ画像に対して分類を行う
+for j=1:160
+  im_neg_train=train(j,:);%学習画像のうちポジティブ画像のみを抽出
+  max0=max(im_neg_train);
+  idx=[];
+  for l=1:max0
+    idx=[idx find(im_neg_train>=l)];
+  end
+  
+  %学習画像のポジティブ画像のbovwベクトルim_pos_trainに対応するpr_pos,pr_negの和
+  pr_im_pos_train=sum(pr_pos(idx));
+  pr_im_neg_train=sum(pr_neg(idx));
+ 
+  %評価画像のbovwベクトルim_pos_evalに対応するpr_pos2,pr_neg2の和を求め
+  %学習画像,pr_im_neg_trainより,pr_im_pos_evalの値が大きければ
+  %評価データをポジティブ画像として正しく認識したと判定
+  for k=1:40
+      im_pos_eval=eval(k,:);
+      max1=max(im_pos_eval);
+      idx2=[];
+      for m=1:max1
+        idx2=[idx2 find(im_pos_eval>=m)];
+      end
+     pr_im_pos_eval=sum(pr_pos2(idx2));
+     pr_im_neg_eval=sum(pr_neg2(idx2));
+     
+      if pr_im_neg_train < pr_im_pos_eval
+          correct=correct+1;
+      else
+          incorrect=incorrect+1;
+      end
+  end
+  
+end
+
+%ネガディブ画像に対して分類を行う
+for j=160:320
+  im_neg_train=train(j,:);%学習画像のうちポジティブ画像のみを抽出
+  max0=max(im_neg_train);
+  idx=[];
+  for l=1:max0
+    idx=[idx find(im_neg_train>=l)];
+  end
+  
+  %学習画像のポジティブ画像のbovwベクトルim_pos_trainに対応するpr_pos,pr_negの和
+  pr_im_pos_train=sum(pr_pos(idx));
+  pr_im_neg_train=sum(pr_neg(idx));
+ 
+  %評価画像のbovwベクトルim_neg_evalに対応するpr_pos2,pr_neg2の和を求め
+  %学習画像,pr_im_pos_trainより,pr_im_neg_evalの値が大きければ
+  %評価データをネガティブ画像として正しく認識したと判定
+  for k=1:40
+      im_neg_eval=eval(k,:);
+      max1=max(im_neg_eval);
+      idx2=[];
+      for m=1:max1
+        idx2=[idx2 find(im_neg_eval>=m)];
+      end
+     pr_im_pos_eval=sum(pr_pos2(idx2));
+     pr_im_neg_eval=sum(pr_neg2(idx2));
+     
+      if pr_im_pos_train < pr_im_neg_eval
+          correct=correct+1;
+      else
+          incorrect=incorrect+1;
+      end
+  end
+ 
+end
+correct_rate=correct/(correct+incorrect);
+accuracy2=[accuracy2 correct_rate];
+end
+
+%カレーと寿司の識別結果(似ていない画像)
+fprintf('Classification rate %.5f by naive bayes between less similar images \n',mean(accuracy));
+%カレーとハヤシライスの識別結果(似ている画像)
+fprintf('Classification rate %.5f by naive bayes between similar images \n',mean(accuracy2));
+%}
+
 %正答数と不正答数
 correct=0;
 incorrect=0;
@@ -45,7 +268,7 @@ for j=1:200
     correct2=correct2+1;
  else
      incorrect=incorrect+1;
-     incorrect=incorrect+1;
+     incorrect2=incorrect2+1;
  end
  
 end
@@ -99,6 +322,8 @@ fprintf('Classification rate %.5f by naive bayes between less similar images \n'
 fprintf('Classification rate %.5f by naive bayes between similar images \n',correct_rate2);
 %{
 実行例
-Classification rate 0.87143 by naive bayes between less similar images 
-Classification rate 0.64737 by naive bayes between similar images 
+Classification rate 0.91500 by naive bayes between less similar images 
+Classification rate 0.61500 by naive bayes between similar images 
+
 %}
+
